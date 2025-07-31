@@ -1,0 +1,328 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% block title %}<title>FlowBoard - Seu Kanban Pessoal</title>{% endblock %}
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/modelo.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/form_modelo.css' %}" />
+  </head>
+
+  <body>
+    {% block menu %}
+    <div class="app-container">
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <i class="fas fa-project-diagram"></i>
+            <span>FlowBoard</span>
+          </div>
+          <button class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+
+        <div class="sidebar-menu">
+          <ul>
+            <li class="active">
+              <a href="#">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fas fa-tasks"></i>
+                <span>Meu Kanban</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fas fa-chart-line"></i>
+                <span>Relatórios</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fas fa-bell"></i>
+                <span>Atividades</span>
+                <span class="notification-badge">3</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fas fa-users"></i>
+                <span>Equipe</span>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i class="fas fa-cog"></i>
+                <span>Configurações</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="user-profile">
+            <div class="avatar">
+              <img
+                src="https://randomuser.me/api/portraits/men/32.jpg"
+                alt="User Avatar"
+              />
+            </div>
+            <div class="user-info">
+              <span class="username">Carlos Silva</span>
+              <span class="user-role">Admin</span>
+            </div>
+            <button class="logout-btn">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
+        </div>
+      </nav>
+      {% endblock %} 
+
+     {% block conteudo %}
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="main-header">
+          <h1>Meu Kanban</h1>
+          <div class="header-actions">
+            <a class="btn btn-primary" href="{% url 'form_modelo' %}">
+              <i class="fas fa-plus"></i> Novo Cartão
+            </a>
+            <div class="search-box">
+              <input type="text" placeholder="Pesquisar..." />
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+        </header>
+        {% endblock %}
+
+
+        {% block column %}
+        <div class="kanban-board">
+          <!-- Coluna A Fazer -->
+          <div class="kanban-column">
+            <div class="column-header">
+              <h3>A Fazer</h3>
+              <span class="task-count">3</span>
+            </div>
+            <div class="tasks-list" id="todo">
+              <div class="task-card" draggable="true">
+                <div class="task-header">
+                  <span class="task-priority high"></span>
+                  <div class="task-actions">
+                    <button class="btn-icon">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="task-body">
+                  <h4>Criar wireframes para novo projeto</h4>
+                  <p>
+                    Desenvolver os wireframes iniciais para aprovação do
+                    cliente.
+                  </p>
+                </div>
+                <div class="task-footer">
+                  <div class="task-meta">
+                    <span class="task-date"
+                      ><i class="far fa-calendar-alt"></i> 15 Jun</span
+                    >
+                    <span class="task-comments"
+                      ><i class="far fa-comment"></i> 2</span
+                    >
+                  </div>
+                  <div class="task-assignee">
+                    <img
+                      src="https://randomuser.me/api/portraits/women/44.jpg"
+                      alt="Assignee"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="task-card" draggable="true">
+                <div class="task-header">
+                  <span class="task-priority medium"></span>
+                  <div class="task-actions">
+                    <button class="btn-icon">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="task-body">
+                  <h4>Revisar documentação técnica</h4>
+                  <p>Verificar se toda a documentação está atualizada.</p>
+                </div>
+                <div class="task-footer">
+                  <div class="task-meta">
+                    <span class="task-date"
+                      ><i class="far fa-calendar-alt"></i> 18 Jun</span
+                    >
+                    <span class="task-comments"
+                      ><i class="far fa-comment"></i> 0</span
+                    >
+                  </div>
+                  <div class="task-assignee">
+                    <img
+                      src="https://randomuser.me/api/portraits/men/22.jpg"
+                      alt="Assignee"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="add-task-btn">
+              <i class="fas fa-plus"></i> Adicionar tarefa
+            </button>
+          </div>
+
+          <!-- Coluna A Fazer -->
+          <div class="kanban-column">
+            <div class="column-header">
+              <h3>Em Progresso</h3>
+              <span class="task-count">2</span>
+            </div>
+            <div class="tasks-list" id="in-progress">
+              <div class="task-card" draggable="true">
+                <div class="task-header">
+                  <span class="task-priority high"></span>
+                  <div class="task-actions">
+                    <button class="btn-icon">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="task-body">
+                  <h4>Implementar autenticação</h4>
+                  <p>Desenvolver sistema de login com JWT e refresh tokens.</p>
+                </div>
+                <div class="task-footer">
+                  <div class="task-meta">
+                    <span class="task-date"
+                      ><i class="far fa-calendar-alt"></i> 10 Jun</span
+                    >
+                    <span class="task-comments"
+                      ><i class="far fa-comment"></i> 5</span
+                    >
+                  </div>
+                  <div class="task-assignee">
+                    <img
+                      src="https://randomuser.me/api/portraits/men/32.jpg"
+                      alt="Assignee"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="add-task-btn">
+              <i class="fas fa-plus"></i> Adicionar tarefa
+            </button>
+          </div>
+
+          <!-- Coluna Em Revisão -->
+          <div class="kanban-column">
+            <div class="column-header">
+              <h3>Em Revisão</h3>
+              <span class="task-count">1</span>
+            </div>
+            <div class="tasks-list" id="in-review">
+              <div class="task-card" draggable="true">
+                <div class="task-header">
+                  <span class="task-priority low"></span>
+                  <div class="task-actions">
+                    <button class="btn-icon">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="task-body">
+                  <h4>Atualizar bibliotecas</h4>
+                  <p>
+                    Verificar compatibilidade após atualização das dependências.
+                  </p>
+                </div>
+                <div class="task-footer">
+                  <div class="task-meta">
+                    <span class="task-date"
+                      ><i class="far fa-calendar-alt"></i> 12 Jun</span
+                    >
+                    <span class="task-comments"
+                      ><i class="far fa-comment"></i> 1</span
+                    >
+                  </div>
+                  <div class="task-assignee">
+                    <img
+                      src="https://randomuser.me/api/portraits/women/33.jpg"
+                      alt="Assignee"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="add-task-btn">
+              <i class="fas fa-plus"></i> Adicionar tarefa
+            </button>
+          </div>
+
+          <!-- Coluna Concluído -->
+          <div class="kanban-column">
+            <div class="column-header">
+              <h3>Concluído</h3>
+              <span class="task-count">4</span>
+            </div>
+            <div class="tasks-list" id="done">
+              <div class="task-card" draggable="true">
+                <div class="task-header">
+                  <span class="task-priority completed"></span>
+                  <div class="task-actions">
+                    <button class="btn-icon">
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="task-body">
+                  <h4>Configurar ambiente de desenvolvimento</h4>
+                  <p>Instalar todas as dependências e configurar Docker.</p>
+                </div>
+                <div class="task-footer">
+                  <div class="task-meta">
+                    <span class="task-date"
+                      ><i class="far fa-calendar-alt"></i> 5 Jun</span
+                    >
+                    <span class="task-comments"
+                      ><i class="far fa-comment"></i> 3</span
+                    >
+                  </div>
+                  <div class="task-assignee">
+                    <img
+                      src="https://randomuser.me/api/portraits/men/45.jpg"
+                      alt="Assignee"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="add-task-btn">
+              <i class="fas fa-plus"></i> Adicionar tarefa
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+    {% endblock %}
+
+    <script src="{% static 'js/modelo.js' %}"></script>
+  </body>
+</html>
