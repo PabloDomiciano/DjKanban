@@ -481,3 +481,88 @@ body {
     width: 180px;
   }
 }
+
+.task-overdue {
+  border-left: 4px solid #ff5252;
+}
+
+.task-priority.high {
+  background-color: #ff5252;
+}
+.task-priority.medium {
+  background-color: #ffab40;
+}
+.task-priority.low {
+  background-color: #69f0ae;
+}
+
+/* Estilos para o drag-and-drop */
+.task-card.dragging {
+  transform: rotate(2deg);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.task-card.updating {
+  opacity: 0.7;
+  position: relative;
+}
+
+.task-card.updating::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--primary-color);
+  animation: progress 2s linear infinite;
+}
+
+@keyframes progress {
+  0% {
+    width: 0;
+    left: 0;
+  }
+  50% {
+    width: 100%;
+    left: 0;
+  }
+  100% {
+    width: 0;
+    left: 100%;
+  }
+}
+
+.tasks-list.dragover {
+  background-color: rgba(37, 99, 235, 0.05);
+  border: 2px dashed var(--primary-color);
+  border-radius: 8px;
+}
+
+.task-feedback {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  padding: 4px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 4px 4px 0 0;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.task-feedback.success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.task-feedback.error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.task-feedback.fade-out {
+  opacity: 0;
+}

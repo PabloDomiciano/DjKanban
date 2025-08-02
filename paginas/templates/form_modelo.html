@@ -1,256 +1,200 @@
-{% extends 'modelo.html' %} {% load static %} {% block title %}<title>
-  Modelo de Formulário</title
->{% endblock %}
+{% extends 'modelo.html' %}
+{% load static %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="{% static 'form_modelo.css' %}">
+{% endblock %}
 
 {% block conteudo %}
-<div class="form-container">
-  <form id="task-form" class="modern-form" novalidate>
+<div class="form-container compact">
+  <form class="modern-form" method="POST" id="task-form">
+    <!-- Cabeçalho -->
     <div class="form-header">
       <div class="form-icon">
         <i class="fas fa-tasks"></i>
       </div>
       <div class="form-header-content">
-        <h2>Nova Tarefa</h2>
-        <p>Preencha os detalhes abaixo para criar uma nova tarefa</p>
+        <h2>{{ title }}</h2>
+        <p>Preencha os detalhes abaixo</p>
       </div>
     </div>
 
-    <div class="form-grid">
-      <!-- Seção Básica -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-info-circle"></i> Informações Básicas
-        </h3>
+    {% csrf_token %}
+    
+    {% if form.non_field_errors %}
+    <div class="form-errors">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+    {% endif %}
 
-        <div class="form-group">
-          <label for="task-title">Título da Tarefa*</label>
-          <div class="input-with-validation">
-            <input
-              type="text"
-              id="task-title"
-              name="task-title"
-              required
-              placeholder="Ex: Implementar autenticação JWT"
-              maxlength="100"
-            />
-            <span class="char-counter">0/100</span>
+    <!-- Campos do formulário com divs separadas -->
+    <div class="fields-grid">
+      
+      <!-- Div para Título -->
+      <div class="input-group">
+        <div class="form-group field-titulo">
+          <div class="input-label">
+            {{ form.titulo.label_tag }}
           </div>
-          <div class="error-message"></div>
-        </div>
-
-        <div class="form-group">
-          <label for="task-description">Descrição</label>
-          <textarea
-            id="task-description"
-            name="task-description"
-            rows="4"
-            placeholder="Descreva os detalhes da tarefa, requisitos e informações relevantes..."
-            class="rich-text"
-          ></textarea>
-          <div class="text-editor-toolbar">
-            <button type="button" class="text-format-btn" data-command="bold">
-              <i class="fas fa-bold"></i>
-            </button>
-            <button type="button" class="text-format-btn" data-command="italic">
-              <i class="fas fa-italic"></i>
-            </button>
-            <button
-              type="button"
-              class="text-format-btn"
-              data-command="insertUnorderedList"
-            >
-              <i class="fas fa-list-ul"></i>
-            </button>
-            <button
-              type="button"
-              class="text-format-btn"
-              data-command="insertLink"
-            >
-              <i class="fas fa-link"></i>
-            </button>
+          <div class="input-field">
+            {{ form.titulo }}
           </div>
+          {% if form.titulo.help_text %}
+          <div class="input-help">
+            <small class="help-text">{{ form.titulo.help_text }}</small>
+          </div>
+          {% endif %}
+          {% for error in form.titulo.errors %}
+          <div class="input-error">
+            <div class="field-error">{{ error }}</div>
+          </div>
+          {% endfor %}
         </div>
       </div>
 
-      <!-- Seção Detalhes -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-cog"></i> Configurações da Tarefa
-        </h3>
-
-        <div class="form-group">
-          <label for="task-priority">Prioridade*</label>
-          <div class="priority-options">
-            <label class="priority-option high">
-              <input type="radio" name="task-priority" value="high" required />
-              <div class="priority-content">
-                <span class="priority-dot"></span>
-                <span class="priority-label">Alta Prioridade</span>
-                <span class="priority-desc">Urgente e importante</span>
-              </div>
-            </label>
-            <label class="priority-option medium">
-              <input type="radio" name="task-priority" value="medium" />
-              <div class="priority-content">
-                <span class="priority-dot"></span>
-                <span class="priority-label">Média Prioridade</span>
-                <span class="priority-desc">Importante mas não urgente</span>
-              </div>
-            </label>
-            <label class="priority-option low">
-              <input type="radio" name="task-priority" value="low" />
-              <div class="priority-content">
-                <span class="priority-dot"></span>
-                <span class="priority-label">Baixa Prioridade</span>
-                <span class="priority-desc">Pode ser agendada</span>
-              </div>
-            </label>
+      <!-- Div para Descrição -->
+      <div class="input-group">
+        <div class="form-group field-descricao">
+          <div class="input-label">
+            {{ form.descricao.label_tag }}
           </div>
-        </div>
-
-        <div class="form-group">
-          <label for="task-status">Status*</label>
-          <select
-            id="task-status"
-            name="task-status"
-            required
-            class="select-with-icon"
-          >
-            <option value="" disabled selected>Selecione o status</option>
-            <option value="todo" data-icon="far fa-circle">A Fazer</option>
-            <option value="in-progress" data-icon="fas fa-spinner">
-              Em Progresso
-            </option>
-            <option value="in-review" data-icon="fas fa-search">
-              Em Revisão
-            </option>
-            <option value="done" data-icon="fas fa-check">Concluído</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="task-due-date">Data de Vencimento</label>
-          <div class="date-input">
-            <input
-              type="date"
-              id="task-due-date"
-              name="task-due-date"
-              min="{{ today|date:'Y-m-d' }}"
-            />
-            <i class="far fa-calendar-alt"></i>
-            <div class="date-options">
-              <button type="button" class="date-quick-option" data-days="1">
-                Amanhã
-              </button>
-              <button type="button" class="date-quick-option" data-days="7">
-                Próxima semana
-              </button>
-            </div>
+          <div class="input-field">
+            {{ form.descricao }}
           </div>
+          {% if form.descricao.help_text %}
+          <div class="input-help">
+            <small class="help-text">{{ form.descricao.help_text }}</small>
+          </div>
+          {% endif %}
+          {% for error in form.descricao.errors %}
+          <div class="input-error">
+            <div class="field-error">{{ error }}</div>
+          </div>
+          {% endfor %}
         </div>
       </div>
 
-      <!-- Seção Atribuição -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-users"></i> Atribuição e Colaboração
-        </h3>
-
-        <div class="form-group">
-          <label for="task-assignee">Responsável Principal*</label>
-          <div class="assignee-select">
-            <div class="selected-assignee" id="assignee-selector">
-              <div class="assignee-placeholder">
-                <i class="fas fa-user-plus"></i>
-                <span>Selecionar responsável</span>
-              </div>
-              <img
-                src=""
-                alt="User"
-                id="assignee-avatar"
-                style="display: none"
-              />
-              <span id="assignee-name" style="display: none"></span>
-            </div>
-            <div class="error-message"></div>
-          </div>
-        </div>
-
+      <!-- Container para Prioridade e Status -->
+      <div class="dual-input-container">
         
+        <!-- Div para Prioridade -->
+        <div class="input-group">
+          <div class="form-group field-prioridade">
+            <div class="input-label">
+              {{ form.prioridade.label_tag }}
+            </div>
+            <div class="input-field">
+              {{ form.prioridade }}
+            </div>
+            {% if form.prioridade.help_text %}
+            <div class="input-help">
+              <small class="help-text">{{ form.prioridade.help_text }}</small>
+            </div>
+            {% endif %}
+            {% for error in form.prioridade.errors %}
+            <div class="input-error">
+              <div class="field-error">{{ error }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
 
+        <!-- Div para Status -->
+        <div class="input-group">
+          <div class="form-group field-status">
+            <div class="input-label">
+              {{ form.status.label_tag }}
+            </div>
+            <div class="input-field">
+              {{ form.status }}
+            </div>
+            {% if form.status.help_text %}
+            <div class="input-help">
+              <small class="help-text">{{ form.status.help_text }}</small>
+            </div>
+            {% endif %}
+            {% for error in form.status.errors %}
+            <div class="input-error">
+              <div class="field-error">{{ error }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Container para Data e Responsável -->
+      <div class="dual-input-container">
+        
+        <!-- Div para Data de Vencimento -->
+        <div class="input-group">
+          <div class="form-group field-data_vencimento">
+            <div class="input-label">
+              {{ form.data_vencimento.label_tag }}
+            </div>
+            <div class="input-field">
+              {{ form.data_vencimento }}
+            </div>
+            {% if form.data_vencimento.help_text %}
+            <div class="input-help">
+              <small class="help-text">{{ form.data_vencimento.help_text }}</small>
+            </div>
+            {% endif %}
+            {% for error in form.data_vencimento.errors %}
+            <div class="input-error">
+              <div class="field-error">{{ error }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Div para Responsável -->
+        <div class="input-group">
+          <div class="form-group field-responsavel">
+            <div class="input-label">
+              {{ form.responsavel.label_tag }}
+            </div>
+            <div class="input-field">
+              {{ form.responsavel }}
+            </div>
+            {% if form.responsavel.help_text %}
+            <div class="input-help">
+              <small class="help-text">{{ form.responsavel.help_text }}</small>
+            </div>
+            {% endif %}
+            {% for error in form.responsavel.errors %}
+            <div class="input-error">
+              <div class="field-error">{{ error }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Rodapé -->
     <div class="form-footer">
       <div class="form-actions">
         <button type="button" class="btn btn-outline" id="clear-form">
-          <i class="fas fa-eraser"></i> Limpar Formulário
-        </button>
-        <button type="button" class="btn btn-secondary" id="save-draft">
-          <i class="far fa-save"></i> Salvar Rascunho
+          <i class="fas fa-eraser"></i> Limpar
         </button>
         <button type="submit" class="btn btn-primary" id="submit-form">
-          <i class="fas fa-plus-circle"></i> Criar Tarefa
+          <i class="fas fa-save"></i> Salvar Tarefa
         </button>
       </div>
     </div>
   </form>
 </div>
+{% endblock %}
 
-<!-- Modal Seleção de Responsável -->
-<div class="modal" id="assignee-modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3><i class="fas fa-user-tag"></i> Selecionar Responsável</h3>
-      <button class="close-modal">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="search-box">
-        <input
-          type="text"
-          placeholder="Pesquisar membros..."
-          id="assignee-search"
-        />
-        <i class="fas fa-search"></i>
-      </div>
-      <div class="team-list" id="team-list">
-        <!-- Dinamicamente preenchido via JS -->
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline close-modal">Cancelar</button>
-      <button class="btn btn-primary" id="confirm-assignee">Selecionar</button>
-    </div>
-  </div>
-</div>
+{% block column %}
+{% endblock %}
 
-<!-- Modal Seleção de Colaboradores -->
-<div class="modal" id="collaborators-modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3><i class="fas fa-users"></i> Selecionar Colaboradores</h3>
-      <button class="close-modal">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="search-box">
-        <input
-          type="text"
-          placeholder="Pesquisar membros..."
-          id="collaborators-search"
-        />
-        <i class="fas fa-search"></i>
-      </div>
-      <div class="team-list" id="collaborators-list">
-        <!-- Dinamicamente preenchido via JS -->
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline close-modal">Cancelar</button>
-      <button class="btn btn-primary" id="confirm-collaborators">
-        Confirmar
-      </button>
-    </div>
-  </div>
-</div>
-{% endblock %} {% block column %} {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/form_modelo.js' %}"></script>
+<script src="{% static 'form_modelo.js' %}"></script>
 {% endblock %}

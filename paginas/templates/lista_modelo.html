@@ -1,0 +1,271 @@
+{% extends "modelo.html" %}
+{% load static %}
+{% load atividade_tags %}
+
+{% block title %}<title>FlowBoard - Lista de Atividades</title>{% endblock %}
+
+{% block conteudo %}
+<main class="main-content">
+  <header class="main-header">
+    <h1>Minhas Atividades</h1>
+    <div class="header-actions">
+      <a class="btn btn-primary" href="{% url 'atividade_create' %}">
+        <i class="fas fa-plus"></i> Novo Cartão
+      </a>
+      <div class="search-box">
+        <input type="text" placeholder="Pesquisar..." />
+        <i class="fas fa-search"></i>
+      </div>
+    </div>
+  </header>
+{% endblock %}
+
+{% block column %}
+  <div class="kanban-board">
+    <!-- Coluna A Fazer -->
+    <div class="kanban-column">
+      <div class="column-header">
+        <h3>A Fazer</h3>
+        <span class="task-count">{{ todo_count }}</span>
+      </div>
+      <div class="tasks-list" id="todo">
+        {% for atividade in atividades %}
+          {% if atividade.status == "a_fazer" %}
+          <div class="task-card {% if atividade.atrasado %}task-overdue{% endif %}" 
+               draggable="true"
+               data-task-id="{{ atividade.id }}"
+               data-status="{{ atividade.status }}">
+            <div class="task-header">
+              <span class="task-priority 
+                {% if atividade.prioridade == 'alta prioridade' %}high
+                {% elif atividade.prioridade == 'media prioridade' %}medium
+                {% else %}low{% endif %}">
+              </span>
+              <div class="task-actions">
+                <a href="{% url 'atividade_edit' atividade.id %}" class="btn-icon">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'atividade_delete' atividade.id %}" class="btn-icon">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </div>
+            <div class="task-body">
+              <h4>{{ atividade.titulo }}</h4>
+              <p>{{ atividade.descricao|truncatechars:100 }}</p>
+            </div>
+            <div class="task-footer">
+              <div class="task-meta">
+                {% if atividade.data_vencimento %}
+                <span class="task-date">
+                  <i class="far fa-calendar-alt"></i> {{ atividade.data_vencimento|date:"d M" }}
+                  {% if atividade.atrasado %}<i class="fas fa-exclamation-circle"></i>{% endif %}
+                </span>
+                {% endif %}
+                <span class="task-comments">
+                  <i class="far fa-comment"></i> 0
+                </span>
+              </div>
+              {% if atividade.responsavel %}
+              <div class="task-assignee">
+                <img src="https://ui-avatars.com/api/?name={{ atividade.responsavel.username|urlencode }}&background=random" 
+                     alt="{{ atividade.responsavel.username }}" />
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        {% empty %}
+          <p class="empty-tasks">Nenhuma atividade nesta coluna</p>
+        {% endfor %}
+      </div>
+      <a href="{% url 'atividade_create' %}?status=a_fazer" class="add-task-btn">
+        <i class="fas fa-plus"></i> Adicionar tarefa
+      </a>
+    </div>
+
+    <!-- Coluna Em Progresso -->
+    <div class="kanban-column">
+      <div class="column-header">
+        <h3>Em Progresso</h3>
+        <span class="task-count">{{ in_progress_count }}</span>
+      </div>
+      <div class="tasks-list" id="in-progress">
+        {% for atividade in atividades %}
+          {% if atividade.status == "em_progresso" %}
+          <div class="task-card {% if atividade.atrasado %}task-overdue{% endif %}" 
+               draggable="true"
+               data-task-id="{{ atividade.id }}"
+               data-status="{{ atividade.status }}">
+            <div class="task-header">
+              <span class="task-priority 
+                {% if atividade.prioridade == 'alta prioridade' %}high
+                {% elif atividade.prioridade == 'media prioridade' %}medium
+                {% else %}low{% endif %}">
+              </span>
+              <div class="task-actions">
+                <a href="{% url 'atividade_edit' atividade.id %}" class="btn-icon">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'atividade_delete' atividade.id %}" class="btn-icon">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </div>
+            <div class="task-body">
+              <h4>{{ atividade.titulo }}</h4>
+              <p>{{ atividade.descricao|truncatechars:100 }}</p>
+            </div>
+            <div class="task-footer">
+              <div class="task-meta">
+                {% if atividade.data_vencimento %}
+                <span class="task-date">
+                  <i class="far fa-calendar-alt"></i> {{ atividade.data_vencimento|date:"d M" }}
+                  {% if atividade.atrasado %}<i class="fas fa-exclamation-circle"></i>{% endif %}
+                </span>
+                {% endif %}
+                <span class="task-comments">
+                  <i class="far fa-comment"></i> 0
+                </span>
+              </div>
+              {% if atividade.responsavel %}
+              <div class="task-assignee">
+                <img src="https://ui-avatars.com/api/?name={{ atividade.responsavel.username|urlencode }}&background=random" 
+                     alt="{{ atividade.responsavel.username }}" />
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        {% empty %}
+          <p class="empty-tasks">Nenhuma atividade nesta coluna</p>
+        {% endfor %}
+      </div>
+      <a href="{% url 'atividade_create' %}?status=em_progresso" class="add-task-btn">
+        <i class="fas fa-plus"></i> Adicionar tarefa
+      </a>
+    </div>
+
+    <!-- Coluna Em Revisão -->
+    <div class="kanban-column">
+      <div class="column-header">
+        <h3>Em Revisão</h3>
+        <span class="task-count">{{ in_review_count }}</span>
+      </div>
+      <div class="tasks-list" id="in-review">
+        {% for atividade in atividades %}
+          {% if atividade.status == "em_revisao" %}
+          <div class="task-card {% if atividade.atrasado %}task-overdue{% endif %}" 
+               draggable="true"
+               data-task-id="{{ atividade.id }}"
+               data-status="{{ atividade.status }}">
+            <div class="task-header">
+              <span class="task-priority 
+                {% if atividade.prioridade == 'alta prioridade' %}high
+                {% elif atividade.prioridade == 'media prioridade' %}medium
+                {% else %}low{% endif %}">
+              </span>
+              <div class="task-actions">
+                <a href="{% url 'atividade_edit' atividade.id %}" class="btn-icon">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'atividade_delete' atividade.id %}" class="btn-icon">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </div>
+            <div class="task-body">
+              <h4>{{ atividade.titulo }}</h4>
+              <p>{{ atividade.descricao|truncatechars:100 }}</p>
+            </div>
+            <div class="task-footer">
+              <div class="task-meta">
+                {% if atividade.data_vencimento %}
+                <span class="task-date">
+                  <i class="far fa-calendar-alt"></i> {{ atividade.data_vencimento|date:"d M" }}
+                  {% if atividade.atrasado %}<i class="fas fa-exclamation-circle"></i>{% endif %}
+                </span>
+                {% endif %}
+                <span class="task-comments">
+                  <i class="far fa-comment"></i> 0
+                </span>
+              </div>
+              {% if atividade.responsavel %}
+              <div class="task-assignee">
+                <img src="https://ui-avatars.com/api/?name={{ atividade.responsavel.username|urlencode }}&background=random" 
+                     alt="{{ atividade.responsavel.username }}" />
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        {% empty %}
+          <p class="empty-tasks">Nenhuma atividade nesta coluna</p>
+        {% endfor %}
+      </div>
+      <a href="{% url 'atividade_create' %}?status=em_revisao" class="add-task-btn">
+        <i class="fas fa-plus"></i> Adicionar tarefa
+      </a>
+    </div>
+
+    <!-- Coluna Concluído -->
+    <div class="kanban-column">
+      <div class="column-header">
+        <h3>Concluído</h3>
+        <span class="task-count">{{ done_count }}</span>
+      </div>
+      <div class="tasks-list" id="done">
+        {% for atividade in atividades %}
+          {% if atividade.status == "concluido" %}
+          <div class="task-card" 
+               draggable="true"
+               data-task-id="{{ atividade.id }}"
+               data-status="{{ atividade.status }}">
+            <div class="task-header">
+              <span class="task-priority completed">
+              </span>
+              <div class="task-actions">
+                <a href="{% url 'atividade_edit' atividade.id %}" class="btn-icon">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'atividade_delete' atividade.id %}" class="btn-icon">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </div>
+            <div class="task-body">
+              <h4>{{ atividade.titulo }}</h4>
+              <p>{{ atividade.descricao|truncatechars:100 }}</p>
+            </div>
+            <div class="task-footer">
+              <div class="task-meta">
+                {% if atividade.data_vencimento %}
+                <span class="task-date">
+                  <i class="far fa-calendar-alt"></i> {{ atividade.data_vencimento|date:"d M" }}
+                </span>
+                {% endif %}
+                <span class="task-comments">
+                  <i class="far fa-comment"></i> 0
+                </span>
+              </div>
+              {% if atividade.responsavel %}
+              <div class="task-assignee">
+                <img src="https://ui-avatars.com/api/?name={{ atividade.responsavel.username|urlencode }}&background=random" 
+                     alt="{{ atividade.responsavel.username }}" />
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        {% empty %}
+          <p class="empty-tasks">Nenhuma atividade nesta coluna</p>
+        {% endfor %}
+      </div>
+      <a href="{% url 'atividade_create' %}?status=concluido" class="add-task-btn">
+        <i class="fas fa-plus"></i> Adicionar tarefa
+      </a>
+    </div>
+  </div>
+
+</main>
+{% endblock %}

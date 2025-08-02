@@ -1,0 +1,75 @@
+{% extends 'modelo.html' %}
+{% load static %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="{% static 'form_modelo.css' %}">
+{% endblock %}
+
+{% block conteudo %}
+<div class="form-container compact">
+  <div class="modern-form" id="delete-form">
+    <!-- Cabeçalho -->
+    <div class="form-header">
+      <div class="form-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="form-header-content">
+        <h2>{{ title }}</h2>
+        <p>Confirme a exclusão do item abaixo</p>
+      </div>
+    </div>
+
+    <!-- Conteúdo da confirmação -->
+    <div class="confirmation-content">
+      <div class="confirmation-message">
+        <p>Você está prestes a excluir permanentemente a seguinte atividade:</p>
+        <div class="item-details">
+          <h3>{{ object.titulo }}</h3>
+          <p><strong>Descrição:</strong> {{ object.descricao }}</p>
+          <p><strong>Prioridade:</strong> {{ object.get_prioridade_display }}</p>
+          <p><strong>Status:</strong> {{ object.get_status_display }}</p>
+          <p><strong>Data de Vencimento:</strong> {{ object.data_vencimento|date:"d/m/Y" }}</p>
+          {% if object.responsavel %}
+          <p><strong>Responsável:</strong> {{ object.responsavel }}</p>
+          {% endif %}
+        </div>
+        <div class="warning-message">
+          <i class="fas fa-exclamation-circle"></i>
+          <span>Esta ação não pode ser desfeita!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="form-footer">
+      <div class="form-actions">
+        <form method="POST">
+          {% csrf_token %}
+          <a href="{% url 'atividade_list' %}" class="btn btn-outline">
+            <i class="fas fa-times"></i> Cancelar
+          </a>
+          <button type="submit" class="btn btn-danger" id="confirm-delete">
+            <i class="fas fa-trash-alt"></i> Confirmar Exclusão
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block column %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Adiciona confirmação adicional
+    document.getElementById('confirm-delete').addEventListener('click', function(e) {
+      if (!confirm('Tem certeza que deseja excluir esta atividade permanentemente?')) {
+        e.preventDefault();
+      }
+    });
+  });
+</script>
+{% endblock %}
