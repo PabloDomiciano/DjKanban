@@ -25,27 +25,23 @@ def update_task_status(request, task_id):
         task = Atividade.objects.get(id=task_id)
         new_status = request.POST.get("status")
 
-        # Verifica permissões
-        if not request.user.is_authenticated:
-            raise PermissionDenied("Acesso negado")
-
         if task.responsavel != request.user and not request.user.is_superuser:
             raise PermissionDenied("Sem permissão para esta tarefa")
 
-        # Validação do status
-        valid_statuses = dict(Atividade.STATUS_CHOICES).keys()
-        if new_status not in valid_statuses:
+        if new_status not in dict(Atividade.STATUS_CHOICES).keys():
             return JsonResponse(
                 {"success": False, "error": "Status inválido"}, status=400
             )
 
-        # Atualiza apenas se mudou
         if task.status != new_status:
             old_status = task.status
             task.status = new_status
+            task.atualizado_por = request.user
             task.save()
 
-            # Notifica observadores
+            # Aqui entra o padrão Observer
+            # Notifica todos os observers cadastrados
+
             atividade_subject.notify(
                 atividade=task,
                 old_status=old_status,
@@ -77,6 +73,23 @@ class AtividadeCreateView(CreateView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
+    def form_valid(self, form):
+        form.instance.criado_por = self.request.user
+        form.instance.atualizado_por = self.request.user
+        response = super().form_valid(form)
+
+
+        # Ao criar atividade, também notifica os observers
+        atividade_subject.notify(
+            atividade=self.object,
+            old_status=None,
+            old_responsavel=None,
+            changed_by=self.request.user,
+        )
+
+        messages.success(self.request, "Atividade criada com sucesso!")
+        return response
+
 
 class AtividadeUpdateView(UpdateView):
     model = Atividade
@@ -106,54 +119,19 @@ class AtividadeUpdateView(UpdateView):
             return redirect(self.success_url)
 
     def form_valid(self, form):
-        """Processa o formulário válido e notifica observadores se o status mudou"""
-        try:
-            atividade = self.get_object()
-            old_status = atividade.status
-            old_responsavel = atividade.responsavel
+        form.instance.criado_por = self.request.user
+        form.instance.atualizado_por = self.request.user
+        response = super().form_valid(form)
 
-            response = super().form_valid(form)
-            new_atividade = form.instance
+        atividade_subject.notify(
+            atividade=self.object,
+            old_status=None,
+            old_responsavel=None,
+            changed_by=self.request.user,
+        )
 
-            # Verifica se houve mudanças relevantes
-            status_changed = new_atividade.status != old_status
-            responsavel_changed = new_atividade.responsavel != old_responsavel
-
-            if status_changed or responsavel_changed:
-                atividade_subject.notify(
-                    atividade=new_atividade,
-                    old_status=old_status,
-                    old_responsavel=old_responsavel,
-                    changed_by=self.request.user,
-                )
-
-                # Log detalhado
-                changes = []
-                if status_changed:
-                    changes.append(f"status ({old_status} → {new_atividade.status})")
-                if responsavel_changed:
-                    changes.append(
-                        f"responsável ({old_responsavel} → {new_atividade.responsavel})"
-                    )
-
-                logger.info(
-                    f"Atividade {new_atividade.id} atualizada por {self.request.user}. "
-                    f"Mudanças: {', '.join(changes)}"
-                )
-
-            messages.success(self.request, "Atividade atualizada com sucesso!")
-            return response
-
-        except Exception as e:
-            logger.error(
-                f"Erro ao atualizar atividade {self.get_object().id}: {str(e)}"
-            )
-            messages.error(
-                self.request,
-                "Ocorreu um erro ao atualizar a atividade. Por favor, tente novamente.",
-                extra_tags="danger",
-            )
-            return self.form_invalid(form)
+        messages.success(self.request, "Atividade criada com sucesso!")
+        return response
 
 
 class AtividadeListView(ListView):

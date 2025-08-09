@@ -49,7 +49,15 @@ class Atividade(models.Model):
         verbose_name="Responsável",
     )
     criado_em = models.DateTimeField(auto_now_add=True)
-    atualizado_em = models.DateTimeField(auto_now=True)
+    atualizado_em = models.DateTimeField(auto_now=True) 
+    atualizado_por = models.ForeignKey(  # Novo campo para rastrear quem atualizou
+            User,
+            on_delete=models.SET_NULL,
+            null=True,
+            blank=True,
+            related_name="atividades_atualizadas"
+        )
+    
 
     class Meta:
         ordering = ["-prioridade", "data_vencimento"]
